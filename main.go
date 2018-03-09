@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"time"
-	//Google appengine import
+
 	"google.golang.org/appengine"
 )
 
@@ -13,8 +14,10 @@ var (
 )
 
 type templateParams struct {
-	Date string
-	Time string
+	Date   string
+	Time   string
+	Notice string
+	Name   string
 }
 
 func main() {
@@ -33,6 +36,27 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	params.Time = curentDate.Format("3:04 PM")
 
 	if r.Method == "GET" {
+		indexTemplate.Execute(w, params)
+	}
+
+	if r.Method == "POST" {
+
+		name := r.FormValue("name")
+		params.Name = name
+		if name == "" {
+			name = "Anonymous"
+		}
+
+		message := r.FormValue("message")
+		if r.FormValue("message") == "" {
+			w.WriteHeader(http.StatusBadRequest)
+
+			params.Notice = "No message"
+			indexTemplate.Execute(w, params)
+			return
+		}
+
+		params.Notice = fmt.Sprintf("Message from %s: %s", name, message)
 		indexTemplate.Execute(w, params)
 	}
 }
