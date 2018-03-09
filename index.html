@@ -10,26 +10,26 @@ body,h1 {font-family: "Raleway", sans-serif}
 body, html {height: 100%}
 </style>
 <body>
-
+  
 <div class="w3-display-container w3-animate-opacity w3-text-black" style="height:500px;">
   <div class="w3-display-topmiddle w3-padding-large w3-large">
     Google Cloud Platform
-  </div>
+    {{with .Notice}}<div class="w3-panel w3-blue" id="notice">{{.}}</div>{{end}}
+    {{with .Warning}}<div class="w3-panel w3-yellow" id="warning">{{.}}</div>{{end}}
+</div>
 
   <div class="w3-display-topright">
     <p1 class="w3-large w3-animate-top">{{.Time}}</p1>
     <p1 class="w3-large w3-animate-top">{{.Date}}</p1>
-   <!-- <hr class="w3-border-grey" style="margin:auto;width:40%"> -->
+    <!-- <hr class="w3-border-grey" style="margin:auto;width:40%"> -->
   </div>
 
-  {{with .Notice}}<div id="notice">{{.}}</div>{{end}}
-
-  <form action="/" method="post" class="w3-display-middle ">
+  <form action="/" method="post" class="w3-display-middle w3-container">
     <label class="w3-animate-top">First Name</label>
     <input class="w3-input" type="text" name="name" value="{{.Name}}">
-    <label class="w3-animate-top">Mesage</label>
+    <label class="w3-animate-top">Message</label>
     <input class="w3-input" type="text" name="message">
-    <input class="w3-button"type="submit">
+    <input class="w3-button w3-blue" type="submit">
   </form> 
 
 </div>
