@@ -14,10 +14,11 @@ var (
 )
 
 type templateParams struct {
-	Date   string
-	Time   string
-	Notice string
-	Name   string
+	Date    string
+	Time    string
+	Notice  string
+	Warning string
+	Name    string
 }
 
 func main() {
@@ -31,9 +32,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	params := templateParams{}
-	curentDate := time.Now().Local()
-	params.Date = curentDate.Format("2006-02-01")
-	params.Time = curentDate.Format("3:04 PM")
+	currentDate := time.Now().Local()
+	params.Date = currentDate.Format("2006-02-01")
+	params.Time = currentDate.Format("3:04 PM")
 
 	if r.Method == "GET" {
 		indexTemplate.Execute(w, params)
@@ -51,7 +52,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		if r.FormValue("message") == "" {
 			w.WriteHeader(http.StatusBadRequest)
 
-			params.Notice = "No message"
+			params.Warning = "No message"
 			indexTemplate.Execute(w, params)
 			return
 		}
