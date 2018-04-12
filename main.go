@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/GoogleCloudPlatform/golang-samples/getting-started/bookshelf"
+
 	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 )
@@ -107,7 +107,7 @@ func publishUpdate(event eventMessage) {
 	if err != nil {
 		return
 	}
-	topic := bookshelf.PubsubClient.Topic(bookshelf.PubsubTopicID)
+	topic := PubsubClient.Topic(PubsubTopicID)
 	_, err = topic.Publish(ctx, &pubsub.Message{Data: b}).Get(ctx)
 	log.Printf("Published update to Pub/Sub for Book ID %d: %v", event.id, err)
 }
