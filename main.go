@@ -11,7 +11,6 @@ import (
 	"cloud.google.com/go/pubsub"
 
 	"golang.org/x/net/context"
-	"google.golang.org/appengine"
 )
 
 var (
@@ -36,7 +35,7 @@ type eventMessage struct {
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-	appengine.Main()
+	//appengine.Main()
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
