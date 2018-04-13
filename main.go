@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
+	"google.golang.org/appengine"
 
 	"golang.org/x/net/context"
 )
@@ -29,13 +30,13 @@ type templateParams struct {
 	Name    string
 }
 type eventMessage struct {
-	id      int
+	name    string
 	message string
 }
 
 func main() {
 	http.HandleFunc("/", indexHandler)
-	//appengine.Main()
+	appengine.Main()
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,23 +44,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
-	ctx := context.Background()
 
-	PubsubClient, err := configurePubsub("riverlife-197216")
-	if err != nil {
-		log.Fatalf("Issue during configuring pubsub")
-	}
-
-	topic := PubsubClient.Topic(PubsubTopicID)
-	exists, err := topic.Exists(ctx)
-	if err != nil {
-		log.Fatal("Error cheking for topic %v", err)
-	}
-	if !exists {
-		if _, err := PubsubClient.CreateTopic(ctx, PubsubTopicID); err != nil {
-			log.Fatal("Failed to create Topic: %v", err)
-		}
-	}
 	params := templateParams{}
 	currentDate := time.Now().Local()
 	params.Date = currentDate.Format("2006-02-01")
@@ -85,30 +70,39 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			indexTemplate.Execute(w, params)
 			return
 		}
-
+		go publishUpdate(eventMessage{name: name, message: message})
 		params.Notice = fmt.Sprintf("Message from %s: %s", name, message)
 		indexTemplate.Execute(w, params)
-		event := eventMessage{}
-		event.id = 1
-		event.message = message
-		publishUpdate(event)
+
 	}
 }
 
 func publishUpdate(event eventMessage) {
-	if PubsubClient == nil {
-		return
+	ctx := context.Background()
+
+	PubsubClient, err := configurePubsub("riverlife-197216")
+	if err != nil {
+		log.Fatalf("Issue during configuring pubsub")
 	}
 
-	ctx := context.Background()
+	topic := PubsubClient.Topic(PubsubTopicID)
+	exists, err := topic.Exists(ctx)
+	if err != nil {
+		log.Fatal("Error cheking for topic %v", err)
+	}
+	if !exists {
+		if _, err := PubsubClient.CreateTopic(ctx, PubsubTopicID); err != nil {
+			log.Fatal("Failed to create Topic: %v", err)
+		}
+	}
 
 	b, err := json.Marshal(event)
 	if err != nil {
 		return
 	}
-	topic := PubsubClient.Topic(PubsubTopicID)
+
 	_, err = topic.Publish(ctx, &pubsub.Message{Data: b}).Get(ctx)
-	log.Printf("Published update to Pub/Sub for Book ID %d: %v", event.id, err)
+	log.Printf("Published update to Pub/Sub for Event ID %d: %v", event.name, err)
 }
 func configurePubsub(projectID string) (*pubsub.Client, error) {
 	//For beginign we have to configure PubSub.Clinet base on our PROJECT_ID
