@@ -1,0 +1,8 @@
+
+module "org-policy-disable-automatic-iam-grants-for-default-sa" {
+  source = "git::https://module.store.git//terraform-gcp-org-policies-constraints"
+  constraint = "constraints/iam.automaticIamGrantsForDefaultServiceAccounts"
+  policy_for = "folder/870056173547"
+  policy_type = "boolean"
+  enforce = true
+}
